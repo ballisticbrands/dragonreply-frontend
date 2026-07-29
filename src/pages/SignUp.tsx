@@ -64,63 +64,82 @@ export function SignUp() {
     <div className="grid items-stretch gap-10 sm:grid-cols-2">
       {/* left — pitch, on the brand-green panel. Text here is fixed white
           rather than themed, because the panel sets its own dark green
-          ground in both light and dark mode. */}
-      <div
-        className="flex flex-col rounded-2xl p-7 text-white shadow-sm sm:p-8"
-        style={{
-          background:
-            "linear-gradient(160deg, var(--brand-green) 0%, color-mix(in srgb, var(--brand-green) 72%, #000) 100%)",
-        }}
-      >
-        <span className="inline-flex w-fit items-center gap-2 rounded-full bg-white/15 px-3.5 py-1.5 text-[13px] font-medium">
-          <span className="h-2 w-2 animate-pulse rounded-full bg-[var(--brand-green-light)]" />
-          Start free
-        </span>
-        <h1 className="mt-5 text-3xl font-extrabold leading-[1.1] tracking-[-0.03em] sm:text-4xl">
-          Reply in seconds.
-          <br />
-          Stay TOS-safe.
-        </h1>
-        <p className="mt-4 max-w-md text-[15px] leading-relaxed text-white/75">
-          The fast, intuitive inbox sellers love — finally on Amazon. Create your account and start
-          drafting replies in minutes.
-        </p>
-        <ul className="mt-7 space-y-3">
-          {VALUE_PROPS.map((text) => (
-            <li key={text} className="flex items-center gap-3 text-[15px]">
-              <CheckCircle className="h-5 w-5 shrink-0 text-[var(--brand-green-light)]" />
-              {text}
-            </li>
-          ))}
-        </ul>
-        <div className="mt-8 flex items-center gap-5">
-          <div>
-            <div className="text-2xl font-extrabold leading-none">10 years</div>
-            <div className="mt-1 text-[11px] uppercase tracking-[0.15em] text-white/60">
-              on Amazon
+          ground. */}
+      <div className="relative flex flex-col">
+        {/* The green ground is a separate absolutely-positioned layer rather
+            than a background on the panel itself, so it can run past the
+            panel's left edge and off the viewport. -100vw is simply "further
+            left than any screen"; AuthLayout's overflow-x-hidden clips it, so
+            it costs no horizontal scroll. Below sm the grid is one column and
+            the panel is an ordinary inset rounded card. */}
+        <div
+          aria-hidden
+          className="absolute inset-y-0 left-0 right-0 rounded-2xl shadow-sm sm:left-[-100vw] sm:rounded-l-none"
+          style={{
+            // Flat green first, gradient second. A browser without color-mix()
+            // (Chrome <111, Safari <16.2, Firefox <113) drops the whole
+            // backgroundImage declaration — without this fallback the panel
+            // loses its ground entirely and renders white-on-white, which is
+            // unreadable rather than merely plainer.
+            backgroundColor: "var(--brand-green)",
+            backgroundImage:
+              "linear-gradient(160deg, var(--brand-green) 0%, color-mix(in srgb, var(--brand-green) 72%, #000) 100%)",
+          }}
+        />
+        {/* Positioned so it paints above the absolute background layer, and
+            flex-1 so the badge's mt-auto still reaches the panel bottom. */}
+        <div className="relative flex flex-1 flex-col p-7 text-white sm:py-9 sm:pl-0 sm:pr-9">
+          <span className="inline-flex w-fit items-center gap-2 rounded-full bg-white/15 px-3.5 py-1.5 text-[13px] font-medium">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-[var(--brand-green-light)]" />
+            Start free
+          </span>
+          <h1 className="mt-5 text-3xl font-extrabold leading-[1.1] tracking-[-0.03em] sm:text-4xl">
+            Reply in seconds.
+            <br />
+            Stay TOS-safe.
+          </h1>
+          <p className="mt-4 max-w-md text-[15px] leading-relaxed text-white/75">
+            The fast, intuitive inbox sellers love — finally on Amazon. Create your account and
+            start drafting replies in minutes.
+          </p>
+          <ul className="mt-7 space-y-3">
+            {VALUE_PROPS.map((text) => (
+              <li key={text} className="flex items-center gap-3 text-[15px]">
+                <CheckCircle className="h-5 w-5 shrink-0 text-[var(--brand-green-light)]" />
+                {text}
+              </li>
+            ))}
+          </ul>
+          <div className="mt-8 flex items-center gap-5">
+            <div>
+              <div className="text-2xl font-extrabold leading-none">10 years</div>
+              <div className="mt-1 text-[11px] uppercase tracking-[0.15em] text-white/60">
+                on Amazon
+              </div>
+            </div>
+            <div className="h-9 w-px bg-white/25" />
+            <div>
+              <div className="text-2xl font-extrabold leading-none">8 figures</div>
+              <div className="mt-1 text-[11px] uppercase tracking-[0.15em] text-white/60">sold</div>
             </div>
           </div>
-          <div className="h-9 w-px bg-white/25" />
-          <div>
-            <div className="text-2xl font-extrabold leading-none">8 figures</div>
-            <div className="mt-1 text-[11px] uppercase tracking-[0.15em] text-white/60">sold</div>
-          </div>
-        </div>
 
-        {/* Amazon partner badge — same asset the landing page uses. The SVG
-            carries its own white ground, so it reads as a seal tile on the
-            green rather than needing a wrapper. mt-auto pins it to the
-            bottom so the panel bottoms out level with the form card. */}
-        <div className="mt-auto flex items-center gap-3.5 border-t border-white/15 pt-6 sm:mt-10">
-          <img
-            src="/logos/badge-amazon-software-partner.svg"
-            alt="Amazon Software Partner"
-            className="h-14 w-14 shrink-0 rounded-lg"
-          />
-          <div className="text-[12px] font-medium leading-snug text-white/75">
-            Official Amazon
-            <br />
-            Software Partner
+          {/* Amazon partner badge — same asset and same h-24/sm:h-28 sizing the
+            landing page uses on /messaging. The SVG carries its own white
+            ground, so it reads as a seal tile on the green rather than
+            needing a wrapper. mt-auto pins it to the bottom so the panel
+            bottoms out level with the form card. */}
+          <div className="mt-auto flex items-center gap-4 border-t border-white/15 pt-6 sm:mt-10">
+            <img
+              src="/logos/badge-amazon-software-partner.svg"
+              alt="Amazon Software Partner"
+              className="h-24 w-auto shrink-0 sm:h-28"
+            />
+            <div className="text-[14px] font-medium leading-snug text-white/75">
+              Official Amazon
+              <br />
+              Software Partner
+            </div>
           </div>
         </div>
       </div>

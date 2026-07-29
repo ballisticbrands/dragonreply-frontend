@@ -39,8 +39,9 @@ export default function App() {
         path="/sign-up"
         element={
           <PublicOnly>
-            {/* Wide column: /sign-up is a two-column pitch + form. */}
-            <AuthLayout width="lg">
+            {/* Wide column: /sign-up is a two-column pitch + form, and its
+                pitch panel bleeds off the left edge of the viewport. */}
+            <AuthLayout width="xl">
               <SignUp />
             </AuthLayout>
           </PublicOnly>
