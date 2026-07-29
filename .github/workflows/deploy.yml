@@ -43,8 +43,19 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          VITE_BACKEND_URL: ${{ secrets.VITE_BACKEND_URL }}
-          VITE_TURNSTILE_SITE_KEY: ${{ secrets.VITE_TURNSTILE_SITE_KEY }}
+          # Public site key for the shared Cloudflare Turnstile widget —
+          # NOT a secret. Turnstile site keys are served to browsers in
+          # plaintext (this one is already readable in every brand app's
+          # shipped bundle); only the paired TURNSTILE_SECRET_KEY, which
+          # lives on the backend, is sensitive. Kept inline so a fresh
+          # fork deploys correctly with no repo secrets to configure.
+          # Any hostname using it must be in the widget's allowlist in
+          # the Cloudflare dashboard.
+          #
+          # Deliberately not the default in src/lib/config.ts: an empty
+          # key there is what makes local dev and preview builds skip
+          # the widget, and localhost is not allowlisted.
+          VITE_TURNSTILE_SITE_KEY: "0x4AAAAAAD0Om6EwWjyl-CF4"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

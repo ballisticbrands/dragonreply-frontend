@@ -59,18 +59,20 @@ What is the SAME across brands:
 
 ## Before this repo can ship — open backend/infra items
 
-These are NOT code changes in this repo, and none of them are done:
+These are NOT code changes in this repo.
 
-1. **GitHub repo + Pages.** Create `ballisticbrands/dragonreply-frontend`,
-   push `main`, enable Pages (source: GitHub Actions), set the
-   `VITE_BACKEND_URL` + `VITE_TURNSTILE_SITE_KEY` repo secrets that
-   `.github/workflows/deploy.yml` reads.
-2. **DNS.** At the registrar for `dragonreply.ai`, add a CNAME on
-   `app` → `ballisticbrands.github.io`. Pages then auto-issues the
-   Let's Encrypt cert for `public/CNAME` (`app.dragonreply.ai`).
-3. **Turnstile allowlist.** Add `app.dragonreply.ai` to the shared
-   Cloudflare Turnstile widget's hostname allowlist, or sign-up
-   will fail verification in prod.
+1. ~~**GitHub repo + Pages.**~~ DONE — repo exists, `main` pushed,
+   Pages source set to GitHub Actions. No repo secrets are needed:
+   the backend URL defaults to `api.getdragonbot.com` in
+   `src/lib/config.ts`, and the public Turnstile site key is inline
+   in `.github/workflows/deploy.yml`. (The earlier
+   `VITE_BACKEND_URL` secret was a dead name — nothing ever read it;
+   the code reads `VITE_API_URL`.)
+2. ~~**DNS.**~~ DONE — `app.dragonreply.ai` CNAMEs to
+   `ballisticbrands.github.io`. Pages auto-issues the Let's Encrypt
+   cert for `public/CNAME` on the first successful deploy.
+3. ~~**Turnstile allowlist.**~~ DONE — `app.dragonreply.ai` added to
+   the shared Cloudflare Turnstile widget's hostname allowlist.
 4. **Backend brand entry.** Add `app.dragonreply.ai` to
    sellerconnect's `src/lib/brand.ts` Origin→brand map, otherwise
    verify-email links and OAuth `return_to` bounce to the wrong app.
