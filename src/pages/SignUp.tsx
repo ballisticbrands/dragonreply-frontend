@@ -61,16 +61,18 @@ export function SignUp() {
   const showMismatch = mismatch || (submitted && form.password !== confirm);
 
   return (
-    <div className="grid items-center gap-10 sm:grid-cols-2">
-      {/* left — pitch */}
-      <div>
-        <span
-          className="inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[13px] font-medium"
-          style={{
-            backgroundColor: "color-mix(in srgb, var(--brand-green) 12%, transparent)",
-            color: "var(--brand-green)",
-          }}
-        >
+    <div className="grid items-stretch gap-10 sm:grid-cols-2">
+      {/* left — pitch, on the brand-green panel. Text here is fixed white
+          rather than themed, because the panel sets its own dark green
+          ground in both light and dark mode. */}
+      <div
+        className="flex flex-col rounded-2xl p-7 text-white shadow-sm sm:p-8"
+        style={{
+          background:
+            "linear-gradient(160deg, var(--brand-green) 0%, color-mix(in srgb, var(--brand-green) 72%, #000) 100%)",
+        }}
+      >
+        <span className="inline-flex w-fit items-center gap-2 rounded-full bg-white/15 px-3.5 py-1.5 text-[13px] font-medium">
           <span className="h-2 w-2 animate-pulse rounded-full bg-[var(--brand-green-light)]" />
           Start free
         </span>
@@ -79,14 +81,14 @@ export function SignUp() {
           <br />
           Stay TOS-safe.
         </h1>
-        <p className="mt-4 max-w-md text-[15px] leading-relaxed text-[var(--muted-foreground)]">
+        <p className="mt-4 max-w-md text-[15px] leading-relaxed text-white/75">
           The fast, intuitive inbox sellers love — finally on Amazon. Create your account and start
           drafting replies in minutes.
         </p>
         <ul className="mt-7 space-y-3">
           {VALUE_PROPS.map((text) => (
             <li key={text} className="flex items-center gap-3 text-[15px]">
-              <CheckCircle className="h-5 w-5 shrink-0 text-[var(--brand-green)]" />
+              <CheckCircle className="h-5 w-5 shrink-0 text-[var(--brand-green-light)]" />
               {text}
             </li>
           ))}
@@ -94,19 +96,31 @@ export function SignUp() {
         <div className="mt-8 flex items-center gap-5">
           <div>
             <div className="text-2xl font-extrabold leading-none">10 years</div>
-            <div className="mt-1 text-[11px] uppercase tracking-[0.15em] text-[var(--muted-foreground)]">
+            <div className="mt-1 text-[11px] uppercase tracking-[0.15em] text-white/60">
               on Amazon
             </div>
           </div>
-          <div
-            className="h-9 w-px"
-            style={{ backgroundColor: "color-mix(in srgb, var(--foreground) 15%, transparent)" }}
-          />
+          <div className="h-9 w-px bg-white/25" />
           <div>
             <div className="text-2xl font-extrabold leading-none">8 figures</div>
-            <div className="mt-1 text-[11px] uppercase tracking-[0.15em] text-[var(--muted-foreground)]">
-              sold
-            </div>
+            <div className="mt-1 text-[11px] uppercase tracking-[0.15em] text-white/60">sold</div>
+          </div>
+        </div>
+
+        {/* Amazon partner badge — same asset the landing page uses. The SVG
+            carries its own white ground, so it reads as a seal tile on the
+            green rather than needing a wrapper. mt-auto pins it to the
+            bottom so the panel bottoms out level with the form card. */}
+        <div className="mt-auto flex items-center gap-3.5 border-t border-white/15 pt-6 sm:mt-10">
+          <img
+            src="/logos/badge-amazon-software-partner.svg"
+            alt="Amazon Software Partner"
+            className="h-14 w-14 shrink-0 rounded-lg"
+          />
+          <div className="text-[12px] font-medium leading-snug text-white/75">
+            Official Amazon
+            <br />
+            Software Partner
           </div>
         </div>
       </div>
