@@ -13,6 +13,7 @@ import { DRAGONREPLY } from "./dragonreply";
 
 export type { BrandConfig } from "@ballisticbrands/frontend-shared";
 export { DRAGONREPLY };
+export { META_PIXEL_ID } from "./dragonreply";
 
 /** The one brand this repo builds. */
 export function activeBrand() {

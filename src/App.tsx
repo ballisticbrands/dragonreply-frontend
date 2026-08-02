@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { useSession } from "@ballisticbrands/frontend-shared";
 import { useBrand } from "@ballisticbrands/frontend-shared";
@@ -19,8 +19,36 @@ export default function App() {
   const location = useLocation();
   const brand = useBrand();
   useEffect(() => {
-    document.title = `${brand.displayName} — Amazon Seller MCP for AI agents`;
+    document.title = `${brand.displayName} — Your Customers, Answered Automatically`;
   }, [location.pathname, brand.displayName]);
+
+  // SPA route pageviews. gtag('config') and the Meta base snippet each fire
+  // exactly one pageview, on hard load — neither knows about client-side
+  // navigation. Without this every in-app route past the entry page goes
+  // uncounted in GA4 and never reaches the Meta Pixel. Skip the first run:
+  // the loaders in main.tsx already counted the initial load, so firing here
+  // too would double-count it.
+  const firstRoute = useRef(true);
+  useEffect(() => {
+    if (firstRoute.current) {
+      firstRoute.current = false;
+      return;
+    }
+    const w = window as unknown as {
+      gtag?: (...args: unknown[]) => void;
+      fbq?: (...args: unknown[]) => void;
+    };
+    try {
+      w.gtag?.("event", "page_view", {
+        page_path: location.pathname,
+        page_location: window.location.href,
+        page_title: document.title,
+      });
+      w.fbq?.("track", "PageView");
+    } catch {
+      /* analytics must never break the app */
+    }
+  }, [location.pathname]);
 
   return (
     <Routes>
