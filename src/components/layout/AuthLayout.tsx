@@ -1,6 +1,6 @@
-import { Link } from "react-router-dom";
 import { config } from "@/lib/config";
 import { useBrand } from "@ballisticbrands/frontend-shared";
+import { BrandLockup } from "@/components/BrandLockup";
 
 /**
  * `width` sizes the content column. "sm" is the default narrow auth card
@@ -29,20 +29,7 @@ export function AuthLayout({
     // The narrow auth cards don't do this, so they keep the default.
     <div className={`min-h-screen flex flex-col ${width === "xl" ? "overflow-x-hidden" : ""}`}>
       <header className="flex items-center justify-between px-6 py-5">
-        {/* Logo lockup mirrors dragonreply-lp's Navbar: the fire mark at h-9
-            with its own aspect ratio (not the squared-off, rounded
-            DragonBot-logo.png this used to use), and the wordmark in Clash
-            Display. The LP hardcodes #1A1A1A; --foreground here is #0a0a0a,
-            an imperceptible difference that keeps the app's theming intact. */}
-        <Link to="/" className="flex items-center gap-2.5">
-          <img src="/logos/dragonbot_fire.png" alt={brand.displayName} className="h-9 w-auto" />
-          <span
-            className="font-clash text-xl font-bold tracking-tight"
-            style={{ lineHeight: "1", paddingTop: "2px" }}
-          >
-            {brand.headerLabel}
-          </span>
-        </Link>
+        <BrandLockup to="/" />
         <a
           href={config.docsUrl}
           target="_blank"
