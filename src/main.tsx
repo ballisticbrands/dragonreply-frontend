@@ -24,6 +24,7 @@ configureShared({
   apiUrl: config.apiUrl,
   brand,
   turnstileSiteKey: config.turnstileSiteKey,
+  googleClientId: config.googleClientId,
 });
 
 // Per-brand analytics injection. Moved out of index.html so a single

@@ -56,6 +56,12 @@ jobs:
           # key there is what makes local dev and preview builds skip
           # the widget, and localhost is not allowlisted.
           VITE_TURNSTILE_SITE_KEY: "0x4AAAAAAD0Om6EwWjyl-CF4"
+          # "Sign in with Google" OAuth Web client ID — public by design
+          # (baked into every brand app's shipped bundle), same inline-
+          # not-secret rationale as the Turnstile site key above. The
+          # app origin must be on the client's Authorized JavaScript
+          # origins list in the Google Cloud console.
+          VITE_GOOGLE_CLIENT_ID: "776606808148-8p8l20pg1vt4jcbde2rr1orvlku87b55.apps.googleusercontent.com"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
