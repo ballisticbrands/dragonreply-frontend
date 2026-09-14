@@ -114,6 +114,57 @@ function ConnectButton({
   );
 }
 
+/**
+ * Seller Central marketplaces we can route a consent to, grouped the way
+ * Amazon splits its regions. Codes must match the backend's
+ * SELLER_CENTRAL_HOSTS (sellerconnect src/services/spapi/consent-url.ts) —
+ * an unknown code is a 400 there. India is in the EU group because that is
+ * the SP-API region it belongs to.
+ */
+const MARKETPLACE_GROUPS: ReadonlyArray<{ label: string; countries: ReadonlyArray<readonly [string, string]> }> = [
+  {
+    label: "North America",
+    countries: [["us", "United States"], ["ca", "Canada"], ["mx", "Mexico"], ["br", "Brazil"]],
+  },
+  {
+    label: "Europe, Middle East & India",
+    countries: [
+      ["uk", "United Kingdom"], ["de", "Germany"], ["fr", "France"], ["it", "Italy"],
+      ["es", "Spain"], ["nl", "Netherlands"], ["be", "Belgium"], ["se", "Sweden"],
+      ["pl", "Poland"], ["ie", "Ireland"], ["tr", "Türkiye"], ["sa", "Saudi Arabia"],
+      ["ae", "United Arab Emirates"], ["eg", "Egypt"], ["za", "South Africa"], ["in", "India"],
+    ],
+  },
+  {
+    label: "Asia-Pacific",
+    countries: [["jp", "Japan"], ["au", "Australia"], ["sg", "Singapore"]],
+  },
+];
+
+const KNOWN_COUNTRIES = new Set(MARKETPLACE_GROUPS.flatMap((g) => g.countries.map(([code]) => code)));
+const COUNTRY_STORAGE_KEY = "spapi_connect_country";
+
+function rememberedCountry(): string {
+  try {
+    const saved = localStorage.getItem(COUNTRY_STORAGE_KEY);
+    if (saved && KNOWN_COUNTRIES.has(saved)) return saved;
+  } catch {
+    /* storage disabled — fall through to the default */
+  }
+  return "us";
+}
+
+/**
+ * Connect a Seller Central account, asking FIRST which marketplace it is in.
+ *
+ * ⚠️ Why the question exists: Amazon's consent page lives on a per-country
+ * Seller Central host, and each host is a separate sign-in realm. Sending
+ * everyone to sellercentral.amazon.com (the old behaviour) locked out any
+ * seller whose login exists only in Europe or Asia-Pacific — a German seller
+ * reported it on 2026-09-14. One connection still imports every marketplace
+ * the seller has in that region, so this is a one-time routing question,
+ * not a scope choice.
+ */
 export function ConnectAmazonButton({
   label = "Connect Amazon Seller Central account",
   variant = "primary",
@@ -124,16 +175,51 @@ export function ConnectAmazonButton({
   onConnected: () => void;
 }) {
   const brand = useBrand();
+  const [country, setCountry] = useState<string>(rememberedCountry);
+
+  function pick(next: string) {
+    setCountry(next);
+    try {
+      localStorage.setItem(COUNTRY_STORAGE_KEY, next);
+    } catch {
+      /* storage disabled — the choice just won't be remembered */
+    }
+  }
+
   return (
-    <ConnectButton
-      label={label}
-      pendingLabel="Waiting for Amazon…"
-      variant={variant}
-      action={startAmazonConnection}
-      popupName={`${brand.id}-spapi-oauth`}
-      matchProvider="amazon-selling-partner"
-      onConnected={onConnected}
-    />
+    <div className="flex flex-col items-end gap-2">
+      <label className="flex flex-wrap items-center justify-end gap-2 text-xs text-[var(--muted-foreground)]">
+        <span>Where is your Seller Central account?</span>
+        <select
+          data-testid="spapi-country"
+          value={country}
+          onChange={(e) => pick(e.target.value)}
+          className="rounded-md border border-[var(--border)] bg-[var(--background)] px-2 py-1 text-sm text-[var(--foreground)]"
+        >
+          {MARKETPLACE_GROUPS.map((group) => (
+            <optgroup key={group.label} label={group.label}>
+              {group.countries.map(([code, name]) => (
+                <option key={code} value={code}>
+                  {name}
+                </option>
+              ))}
+            </optgroup>
+          ))}
+        </select>
+      </label>
+      <ConnectButton
+        label={label}
+        pendingLabel="Waiting for Amazon…"
+        variant={variant}
+        action={() => startAmazonConnection(country)}
+        popupName={`${brand.id}-spapi-oauth`}
+        matchProvider="amazon-selling-partner"
+        onConnected={onConnected}
+      />
+      <p className="text-[11px] text-[var(--muted-foreground)]">
+        We import every marketplace you sell in within that region.
+      </p>
+    </div>
   );
 }
 

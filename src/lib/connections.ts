@@ -44,11 +44,12 @@ export async function listConnections(): Promise<Connection[]> {
 async function startConnection(
   startPath: string,
   errorLabel: string,
+  extraBody: Record<string, string> = {},
 ): Promise<{ authorization_url?: string; error?: string }> {
   try {
     const resp = await apiFetch<{ authorization_url: string }>(startPath, {
       method: "POST",
-      body: JSON.stringify({ return_to: RETURN_TO }),
+      body: JSON.stringify({ return_to: RETURN_TO, ...extraBody }),
     });
     if (!resp.authorization_url) return { error: "We couldn't start the connection. Please try again." };
     return { authorization_url: resp.authorization_url };
@@ -58,10 +59,17 @@ async function startConnection(
   }
 }
 
-export async function startAmazonConnection() {
+/**
+ * Start an SP-API connection for the Seller Central marketplace the seller
+ * picked. `country` chooses Amazon's consent HOST, and each host is its own
+ * sign-in realm — a Europe-only login cannot get through sellercentral.amazon.com,
+ * which is where every connection went before this took a country.
+ */
+export async function startAmazonConnection(country = "us") {
   return startConnection(
     "/v1/connect/amazon-selling-partner/start",
     "Could not start the Amazon connection.",
+    { country },
   );
 }
 
